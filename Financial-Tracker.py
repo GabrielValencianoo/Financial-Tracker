@@ -2,7 +2,6 @@ import tkinter as tk
 import ttkbootstrap as tb
 from tkinter import ttk, filedialog, messagebox
 import pandas as pd
-import openpyxl
 from datetime import datetime
 from ofxparse import OfxParser
 import os
@@ -30,7 +29,7 @@ banco_id = {
     
 }
 
-contas = ['Bradesco', 'Itau', 'Nubank', 'Santander', 'Caixa']
+contas = ['Inter',"C6", 'Itau', 'Nubank', 'Santander', 'Bradesco']
 
 categorias = {
     "Moradia": [
@@ -75,7 +74,7 @@ categorias = {
         "Vacinas"
     ],
     "Educação / Desenvolvimento": [
-        "Graduação",
+        "Cursos",
         "Pós",
         "Plataformas online",
         "Idiomas",
@@ -369,6 +368,25 @@ def atualizar_registro(event):
     
     tk.Button(janela_edit, text="Salvar", command=salvar_alteracao, bg="blue", fg="white").pack(pady=20)
 
+
+def duplicar_registro():
+    """Duplica o registro selecionado"""
+    global df_global, tree_widget
+    
+    selecionado = tree_widget.selection()
+    if not selecionado:
+        messagebox.showwarning("Aviso", "Selecione um registro para duplicar!")
+        return
+    
+    item = tree_widget.item(selecionado[0])
+    valores = item['values']
+    idx = valores[0]
+    
+    nova_linha = df_global.loc[idx].copy()
+    df_global.loc[len(df_global)] = nova_linha
+    atualizar_tabela()
+    messagebox.showinfo("Sucesso", "Registro duplicado!")
+
 def deletar_registro():
     """Deleta o registro selecionado"""
     global df_global, tree_widget
@@ -497,7 +515,9 @@ def criar_interface():
     tk.Button(frame_crud, text="Deletar", command=deletar_registro, 
               bg="#F44336", fg="white", width=12).grid(row=0, column=2, padx=5)
     tk.Button(frame_crud, text="Deletar Tudo", command=deletar_tabela, 
-              bg="#F44336", fg="white", width=12).grid(row=0, column=3, padx=5)   
+              bg="#F44336", fg="white", width=12).grid(row=0, column=3, padx=5)  
+    tk.Button(frame_crud, text="Duplicar", command=duplicar_registro, 
+              bg="#FFC107", fg="white", width=12).grid(row=0, column=4, padx=5)  
     
 
     # Frame da tabela
