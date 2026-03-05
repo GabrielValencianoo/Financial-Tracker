@@ -311,8 +311,8 @@ def atualizar_registro(event):
     janela_edit.geometry("700x700+1200+200")
 
     tk.Label(janela_edit, text="Conta:").pack(pady=5)
-    entry_conta = tk.Entry(janela_edit, width=30)
-    entry_conta.insert(0, valores[1])
+    entry_conta = ttk.Combobox(janela_edit, values=list(df_global["Conta"].unique()), width=30)
+    entry_conta.set(valores[1])
     entry_conta.pack()
 
     tk.Label(janela_edit, text="Categoria:").pack(pady=5)
