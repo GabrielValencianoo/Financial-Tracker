@@ -239,7 +239,7 @@ def adicionar_registro():
     
     # Campos
     tk.Label(janela_add, text="Conta:").pack(pady=5)
-    entry_conta = ttk.Combobox(janela_add, values=list(df_global["Conta"].unique()), width=30)
+    entry_conta = ttk.Combobox(janela_add, values=contas, width=30)
     #entry_conta = tk.Entry(janela_add, width=30)
     entry_conta.pack()
     #entry_conta.insert(0, df_global["Conta"].unique())
@@ -311,7 +311,7 @@ def atualizar_registro(event):
     janela_edit.geometry("700x700+1200+200")
 
     tk.Label(janela_edit, text="Conta:").pack(pady=5)
-    entry_conta = ttk.Combobox(janela_edit, values=list(df_global["Conta"].unique()), width=30)
+    entry_conta = ttk.Combobox(janela_edit, values=contas, width=30)
     entry_conta.set(valores[1])
     entry_conta.pack()
 
