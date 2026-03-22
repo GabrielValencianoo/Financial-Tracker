@@ -5,6 +5,7 @@ import pandas as pd
 from datetime import datetime
 from ofxparse import OfxParser
 import os
+import json
 
 # Variáveis globais
 df_global = None
@@ -29,114 +30,8 @@ banco_id = {
     
 }
 
-contas = ['Inter',"C6", 'Itau', 'Nubank', 'Santander', 'Bradesco']
-
-categorias = {
-    "Moradia": [
-        "Aluguel / Financiamento",
-        "Condomínio",
-        "IPTU",
-        "Água",
-        "Energia elétrica",
-        "Internet / TV / Telefone",
-        "Manutenção",
-        "Limpeza",
-        "Móveis",
-        "Eletrodomésticos"
-    ],
-    "Alimentação": [
-        "Mercado",
-        "Feira",
-        "Açougue",
-        "Padaria",
-        "Restaurante",
-        "Marmita",
-        "Delivery"
-    ],
-    "Transporte": [
-        "Combustível",
-        "Pedágio",
-        "IPVA / Licenciamento",
-        "Estacionamento",
-        "Seguro do veículo",
-        "Táxi / Uber",
-        "Transporte público",
-        "Manutenção / Revisão"
-    ],
-    "Saúde": [
-        "Plano de Saúde",
-        "Farmácia / Medicamentos",
-        "Consultas médicas",
-        "Exames",
-        "Dentista",
-        "Terapias / Psicólogo",
-        "Convênio",
-        "Vacinas"
-    ],
-    "Educação / Desenvolvimento": [
-        "Cursos",
-        "Pós",
-        "Plataformas online",
-        "Idiomas",
-        "Workshops"
-    ],
-    "Lazer e Entretenimento": [
-        "Cinema",
-        "Teatro",
-        "Shows",
-        "Streaming (Netflix, etc.)",
-        "Jogos",
-        "Academia / Esportes",
-        "Livro",
-        "Eventos / passeios",
-        "Presentes"
-    ],
-    "Autocuidado": [
-        "Roupas / Calçados",
-        "Cabelo (Salão)",
-        "Higiene pessoal"
-    ],
-    "Viagens e Turismo": [
-        "Passagens Aéreas",
-        "Hospedagem",
-        "Transporte Local (Táxi/Uber)",
-        "Alimentação em Viagem",
-        "Passeios e Atrações",
-        "Seguro Viagem",
-        "Aluguel de Veículo",
-        "Presentes"
-    ],
-    "Impostos e Taxas": [
-        "Imposto de Renda",
-        "Imposto",
-        "Tarifas bancárias",
-        "Seguros",
-        "Multas"
-    ],
-    "Presente": [
-        "Presente"
-    ],
-    "Receitas": [
-        "Salário",
-        "Férias",
-        "Bonus",
-        "Freelance",
-        "Rescisão",
-        "Investimentos",
-        "Rendimentos",
-        "Dividendos",
-        "Venda de bens",
-        "Reembolsos",
-        "Outras receitas"
-    ],
-    "Outros": [
-        "Saque",
-        "Despesa desconhecida"
-    ],
-    "Transfer": [
-        "Transfer"
-    ]
-}
+contas = []
+categorias = {}
 
 
 def criar_excel_padrao():
@@ -265,7 +160,7 @@ def adicionar_registro():
     entry_desc.pack()
     
     tk.Label(janela_add, text="Data (AAAA-MM-DD):").pack(pady=5)
-    entry_data = tb.DateEntry(janela_add, width=30)
+    entry_data = tb.DateEntry(janela_add, dateformat = "%Y-%m-%d",width=30)
     entry_data.pack()
 
     tk.Label(janela_add, text="Transfer:").pack(pady=5)
@@ -483,6 +378,23 @@ def importar_ofx():
         except Exception as e:
             messagebox.showerror("Erro", f"Erro ao importar OFX: {str(e)}")
 
+
+def read_txt_settings():
+    """Lê configurações de um arquivo .txt (exemplo para futuras customizações)"""
+    global contas, categorias
+    jsonSettings = {}
+    try:
+        with open("Financial_Settings.json", "r", encoding="utf-8") as file:
+            jsonSettings = json.load(file)
+    except FileNotFoundError:
+        print("Arquivo de configuração não encontrado. Usando configurações padrão.")
+    except Exception as e:
+        print(f"Erro ao ler configurações: {str(e)}")
+    
+
+    contas = jsonSettings.get("contas", [])
+    categorias = jsonSettings.get("categorias", {})
+
 def criar_interface():
     """Cria a interface principal"""
     global tree_widget
@@ -558,6 +470,7 @@ def criar_interface():
     scrollbar.config(command=tree_widget.yview)
 
     tree_widget.bind('<Double-1>', atualizar_registro )
+    read_txt_settings()
     
     root.mainloop()
 

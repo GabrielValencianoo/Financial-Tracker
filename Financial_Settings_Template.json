@@ -1,0 +1,116 @@
+{
+  "contas": [
+    "Inter",
+    "C6",
+    "Itau",
+    "Nubank",
+    "Santander",
+    "Bradesco"
+  ],
+  "categorias": {
+    "Moradia": [
+      "Aluguel / Financiamento",
+      "Condomínio",
+      "IPTU",
+      "Água",
+      "Energia elétrica",
+      "Internet / TV / Telefone",
+      "Manutenção",
+      "Limpeza",
+      "Móveis",
+      "Eletrodomésticos"
+    ],
+    "Alimentação": [
+      "Mercado",
+      "Feira",
+      "Açougue",
+      "Padaria",
+      "Restaurante",
+      "Marmita",
+      "Delivery"
+    ],
+    "Transporte": [
+      "Combustível",
+      "Pedágio",
+      "IPVA / Licenciamento",
+      "Estacionamento",
+      "Seguro do veículo",
+      "Táxi / Uber",
+      "Transporte público",
+      "Manutenção / Revisão"
+    ],
+    "Saúde": [
+      "Plano de Saúde",
+      "Farmácia / Medicamentos",
+      "Consultas médicas",
+      "Exames",
+      "Dentista",
+      "Terapias / Psicólogo",
+      "Convênio",
+      "Vacinas"
+    ],
+    "Educação / Desenvolvimento": [
+      "Cursos",
+      "Pós",
+      "Plataformas online",
+      "Idiomas",
+      "Workshops"
+    ],
+    "Lazer e Entretenimento": [
+      "Cinema",
+      "Teatro",
+      "Shows",
+      "Streaming (Netflix, etc.)",
+      "Jogos",
+      "Academia / Esportes",
+      "Livro",
+      "Eventos / passeios",
+      "Presentes"
+    ],
+    "Autocuidado": [
+      "Roupas / Calçados",
+      "Cabelo (Salão)",
+      "Higiene pessoal"
+    ],
+    "Viagens e Turismo": [
+      "Passagens Aéreas",
+      "Hospedagem",
+      "Transporte Local (Táxi/Uber)",
+      "Alimentação em Viagem",
+      "Passeios e Atrações",
+      "Seguro Viagem",
+      "Aluguel de Veículo",
+      "Presentes"
+    ],
+    "Impostos e Taxas": [
+      "Imposto de Renda",
+      "Imposto",
+      "Tarifas bancárias",
+      "Seguros",
+      "Multas"
+    ],
+    "Presente": [
+      "Presente"
+    ],
+    "Receitas": [
+      "Salário",
+      "Férias",
+      "Bonus",
+      "Freelance",
+      "Rescisão",
+      "Investimentos",
+      "Rendimentos",
+      "Dividendos",
+      "Venda de bens",
+      "Reembolsos",
+      "Outras receitas"
+    ],
+    "Outros": [
+      "Saque",
+      "Despesa desconhecida"
+    ],
+    "Transfer": [
+      "Transfer"
+    ]
+  }
+}
