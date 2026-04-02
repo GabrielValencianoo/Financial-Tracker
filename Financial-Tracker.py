@@ -422,7 +422,7 @@ def criar_interface():
     
     tk.Button(frame_crud, text="Adicionar", command=adicionar_registro, 
               bg="#4CAF50", fg="white", width=12).grid(row=0, column=0, padx=5)
-    tk.Button(frame_crud, text="Atualizar", command=atualizar_registro, 
+    tk.Button(frame_crud, text="Atualizar", command= lambda: atualizar_registro(None), 
               bg="#2196F3", fg="white", width=12).grid(row=0, column=1, padx=5)
     tk.Button(frame_crud, text="Deletar", command=deletar_registro, 
               bg="#F44336", fg="white", width=12).grid(row=0, column=2, padx=5)
