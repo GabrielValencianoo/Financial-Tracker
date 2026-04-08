@@ -32,6 +32,18 @@ banco_id = {
 
 contas = []
 categorias = {}
+dict_mapeamento = {}
+
+VALORES_PADRAO = {
+    'Conta': 'Desconhecido',
+    'Categoria': 'Outros',
+    'Subcategoria': 'Despesa desconhecida',
+    'Data': datetime.now().strftime("%Y-%m-%d"),
+    'Descrição': "Sem descrição",
+    'Valor': 0.0,
+    'Tipo': "Despesa",
+    'Transfer': 0
+}
 
 
 def criar_excel_padrao():
@@ -110,16 +122,16 @@ def atualizar_tabela():
         for idx, row in df_global.iterrows():
             tree_widget.insert('', 'end', values=(idx, *row.values))
     
-    print(df_global.head())
-    print(df_global.describe())
-    print(df_global.info())
-    print(df_global["Conta"].unique())
-    print(df_global.groupby('Conta').size())
-    print(df_global.groupby('Categoria').size())
-    print(df_global.groupby('Subcategoria').size())
-    print(df_global.groupby('Tipo').size())    
-    print(df_global["Valor"].sum())
-    print(df_global.groupby('Conta')["Valor"].sum().round(2))
+    # print(df_global.head())
+    # print(df_global.describe())
+    # print(df_global.info())
+    # print(df_global["Conta"].unique())
+    # print(df_global.groupby('Conta').size())
+    # print(df_global.groupby('Categoria').size())
+    # print(df_global.groupby('Subcategoria').size())
+    # print(df_global.groupby('Tipo').size())    
+    # print(df_global["Valor"].sum())
+    # print(df_global.groupby('Conta')["Valor"].sum().round(2))
 
 def adicionar_registro():
     """Abre janela para adicionar novo registro"""
@@ -313,6 +325,88 @@ def deletar_tabela():
         atualizar_tabela()
         messagebox.showinfo("Sucesso", "Todos os registros foram deletados!")
 
+
+
+def importar_csv():
+    """Importa dados de um arquivo CSV"""
+    global df_global,df_importado
+    
+    if df_global is None:
+        df_global = criar_excel_padrao()
+    
+    filename = filedialog.askopenfilename(
+        title="Selecione o arquivo CSV",
+        filetypes=[("CSV files", "*.csv"), ("All files", "*.*")]
+    )
+
+
+    print(filename)
+    if filename is None or filename == "":
+        messagebox.showwarning("Aviso", "Nenhum arquivo selecionado!")
+        return
+    
+    try:
+        df_importado = pd.read_csv(filename)
+        colunas_csv = df_importado.columns.tolist()
+        janela_csv = tk.Toplevel()
+        janela_csv.title("Importar CSV")
+        janela_csv.geometry("700x700+1200+200")
+        for col_prog in df_global.columns:
+            lbl = tk.Label(janela_csv, text=f"{col_prog}:", font=('Arial', 10, 'bold'))
+            lbl.pack(anchor="w", pady=(5, 0))
+
+            if col_prog == "Conta":
+                combo = ttk.Combobox(janela_csv, values=["IGNORAR"] + colunas_csv, state="readonly", width=30)
+            # elif col_prog == "Categoria":
+            #     combo = ttk.Combobox(janela_csv, values=["IGNORAR"] + colunas_csv + list(categorias.keys()), state="readonly", width=30)
+            else:
+                combo = ttk.Combobox(janela_csv, values=["IGNORAR"] + colunas_csv, state="readonly", width=30)
+            combo.pack(fill="x", pady=2)
+            dict_mapeamento[col_prog] = combo
+        
+
+
+    except Exception as e:
+        messagebox.showerror("Erro", f"Erro ao importar CSV: {str(e)}")
+
+    def realizar_concatenacao():
+        """Executa o de/para e concatena os dataframes removendo NaNs."""
+        global df_importado,df_global
+        
+        try:
+            
+            df_novo = pd.DataFrame("", index=range(len(df_importado)), columns=df_global.columns)
+
+            for col_prog, combo in dict_mapeamento.items():
+                escolha = combo.get()
+
+                if escolha == "IGNORAR":
+                    # Cria uma coluna com o valor padrão repetido para todas as linhas do CSV
+                    valor_fixo = VALORES_PADRAO.get(col_prog) # Usa "" se não achar no dicionário
+                    df_novo[col_prog] = valor_fixo
+                else:
+                    # Mapeia a coluna do CSV para o nome da sua coluna original
+                    df_novo[col_prog] = df_importado[escolha].values
+                
+
+            print(df_novo.head())
+            # 1. Concatena o df original com o novo processado
+            df_final = pd.concat([df_global, df_novo], ignore_index=True)
+            
+            # 2. A MÁGICA: Substitui todos os valores NaN por string vazia ''
+            df_global = df_final.fillna('')
+
+            atualizar_tabela()
+            janela_csv.destroy()
+            messagebox.showinfo("Sucesso", f"{len(df_importado)} registros importados do CSV!")
+            
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro no processamento: {e}")
+    
+    btn_processar = tk.Button(janela_csv, text="3. Concatenar e Finalizar", 
+                    command=realizar_concatenacao, bg="#4caf50", fg="white", font=('Arial', 10, 'bold'))
+    btn_processar.pack(pady=10, padx=20, fill="x")
+
 def importar_ofx():
     """Importa dados de arquivo OFX usando ofxparse"""
     global df_global
@@ -415,6 +509,8 @@ def criar_interface():
               bg="#FF9800", fg="white", width=12).grid(row=0, column=2, padx=5)
     tk.Button(frame_botoes, text="Importar OFX", command=importar_ofx, 
               bg="#9C27B0", fg="white", width=12).grid(row=0, column=3, padx=5)
+    tk.Button(frame_botoes, text="Importar CSV", command=importar_csv, 
+              bg="#009688", fg="white", width=12).grid(row=0, column=4, padx=5)
     
     # Frame CRUD
     frame_crud = tk.Frame(root)
