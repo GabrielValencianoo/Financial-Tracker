@@ -41,15 +41,14 @@ VALORES_PADRAO = {
     'Data': datetime.now().strftime("%Y-%m-%d"),
     'Descrição': "Sem descrição",
     'Valor': 0.0,
-    'Tipo': "Despesa",
-    'Transfer': 0
+    'Tipo': "Despesa"
 }
 
 
 def criar_excel_padrao():
     """Cria um DataFrame padrão se não houver arquivo"""
-    return pd.DataFrame(columns=['Conta','Categoria','Subcategoria', 'Valor', 'Tipo', 'Descrição','Data','Transfer'])
-    #return pd.DataFrame(columns=['Data', 'Descrição', 'Valor', 'Tipo'])
+    return pd.DataFrame(columns=['Conta','Categoria','Subcategoria', 'Valor', 'Tipo', 'Descrição','Data'])
+    
 
 def carregar_excel():
     """Carrega arquivo Excel"""
@@ -125,13 +124,13 @@ def atualizar_tabela():
     # print(df_global.head())
     # print(df_global.describe())
     # print(df_global.info())
-    # print(df_global["Conta"].unique())
-    # print(df_global.groupby('Conta').size())
-    # print(df_global.groupby('Categoria').size())
-    # print(df_global.groupby('Subcategoria').size())
-    # print(df_global.groupby('Tipo').size())    
-    # print(df_global["Valor"].sum())
-    # print(df_global.groupby('Conta')["Valor"].sum().round(2))
+    print(df_global["Conta"].unique())
+    print(df_global.groupby('Conta').size())
+    print(df_global.groupby('Categoria').size())
+    print(df_global.groupby('Subcategoria').size())
+    print(df_global.groupby('Tipo').size())    
+    print(df_global["Valor"].sum())
+    print(df_global.groupby('Conta')["Valor"].sum().round(2))
 
 def adicionar_registro():
     """Abre janela para adicionar novo registro"""
@@ -147,9 +146,7 @@ def adicionar_registro():
     # Campos
     tk.Label(janela_add, text="Conta:").pack(pady=5)
     entry_conta = ttk.Combobox(janela_add, values=contas, width=30)
-    #entry_conta = tk.Entry(janela_add, width=30)
     entry_conta.pack()
-    #entry_conta.insert(0, df_global["Conta"].unique())
 
     tk.Label(janela_add, text="Categoria:").pack(pady=5)
     entry_categoria = ttk.Combobox(janela_add, values=list(categorias.keys()), width=30)
@@ -175,9 +172,6 @@ def adicionar_registro():
     entry_data = tb.DateEntry(janela_add, dateformat = "%Y-%m-%d",width=30)
     entry_data.pack()
 
-    tk.Label(janela_add, text="Transfer:").pack(pady=5)
-    combo_transfer = ttk.Combobox(janela_add, values=[1, 0], width=28)
-    combo_transfer.pack()
     
     def salvar_novo():
         try:
@@ -188,8 +182,7 @@ def adicionar_registro():
                 'Data': entry_data.get_date().strftime("%Y-%m-%d"),
                 'Descrição': entry_desc.get(),
                 'Valor': float(entry_valor.get()),
-                'Tipo': combo_tipo.get(),
-                'Transfer': combo_transfer.get()
+                'Tipo': combo_tipo.get()
             }
             df_global.loc[len(df_global)] = nova_linha
             atualizar_tabela()
@@ -252,10 +245,6 @@ def atualizar_registro(event):
     entry_data.set_date(datetime.strptime(valores[7], "%Y-%m-%d"))
     entry_data.pack()
     
-    tk.Label(janela_edit, text="Transfer:").pack(pady=5)
-    combo_transfer = ttk.Combobox(janela_edit, values=["1", "0"], width=28)
-    combo_transfer.set(valores[8])
-    combo_transfer.pack()
     
     def salvar_alteracao():
         try:
@@ -266,7 +255,7 @@ def atualizar_registro(event):
             df_global.at[idx, 'Descrição'] = entry_desc.get()
             df_global.at[idx, 'Valor'] = float(entry_valor.get())
             df_global.at[idx, 'Tipo'] = combo_tipo.get()
-            df_global.at[idx, 'Transfer'] = combo_transfer.get()
+            # df_global.at[idx, 'Transfer'] = combo_transfer.get()
             atualizar_tabela()
             janela_edit.destroy()
             messagebox.showinfo("Sucesso", "Registro atualizado!")
@@ -442,8 +431,6 @@ def importar_ofx():
                     
                     tipo = "Receita" if valor > 0 else "Despesa"
 
-                    transfer = int(0)
-
                     try:
                         conta = banco_id[account.routing_number]
                     except KeyError:
@@ -459,8 +446,7 @@ def importar_ofx():
                         'Data': data_formatada,
                         'Descrição': descricao,
                         'Valor': valor,
-                        'Tipo': tipo,
-                        'Transfer': transfer
+                        'Tipo': tipo                       
                     }
                     
                     df_global.loc[len(df_global)] = nova_linha
@@ -537,8 +523,7 @@ def criar_interface():
     scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
     
     # Treeview
-    colunas =('ID','Conta','Categoria','Subcategoria', 'Valor', 'Tipo', 'Descrição','Data','Transfer')
-    #colunas = ('ID', 'Data', 'Descrição', 'Valor', 'Tipo')
+    colunas =('ID','Conta','Categoria','Subcategoria', 'Valor', 'Tipo', 'Descrição','Data')
     tree_widget = ttk.Treeview(frame_tabela, columns=colunas, show='headings', 
                                yscrollcommand=scrollbar.set)
 
@@ -550,7 +535,6 @@ def criar_interface():
     tree_widget.heading('Tipo', text='Tipo')
     tree_widget.heading('Descrição', text='Descrição')
     tree_widget.heading('Data', text='Data')
-    tree_widget.heading('Transfer', text='Transfer')
 
     tree_widget.column('ID', width=50)
     tree_widget.column('Conta', width=100)
@@ -560,7 +544,6 @@ def criar_interface():
     tree_widget.column('Tipo', width=100)
     tree_widget.column('Descrição', width=400)
     tree_widget.column('Data', width=100)
-    tree_widget.column('Transfer', width=100)
 
     tree_widget.pack(fill=tk.BOTH, expand=True)
     scrollbar.config(command=tree_widget.yview)
