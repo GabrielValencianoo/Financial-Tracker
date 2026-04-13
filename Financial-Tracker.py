@@ -145,15 +145,15 @@ def adicionar_registro():
     
     # Campos
     tk.Label(janela_add, text="Conta:").pack(pady=5)
-    entry_conta = ttk.Combobox(janela_add, values=contas, width=30)
+    entry_conta = ttk.Combobox(janela_add, values=contas, width=30,height = 50)
     entry_conta.pack()
 
     tk.Label(janela_add, text="Categoria:").pack(pady=5)
-    entry_categoria = ttk.Combobox(janela_add, values=list(categorias.keys()), width=30)
+    entry_categoria = ttk.Combobox(janela_add, values=list(categorias.keys()), width=30,height = 50)
     entry_categoria.pack()   
 
     tk.Label(janela_add, text="Subcategoria:").pack(pady=5)
-    entry_subcategoria = ttk.Combobox(janela_add, postcommand=lambda: entry_subcategoria.config(values=categorias[entry_categoria.get()]), width=30)
+    entry_subcategoria = ttk.Combobox(janela_add, postcommand=lambda: entry_subcategoria.config(values=categorias[entry_categoria.get()]), width=30,height = 50)
     entry_subcategoria.pack() 
 
     tk.Label(janela_add, text="Valor:").pack(pady=5)
@@ -211,17 +211,17 @@ def atualizar_registro(event):
     janela_edit.geometry("700x700+1200+200")
 
     tk.Label(janela_edit, text="Conta:").pack(pady=5)
-    entry_conta = ttk.Combobox(janela_edit, values=contas, width=30)
+    entry_conta = ttk.Combobox(janela_edit, values=contas, width=30,height = 50)
     entry_conta.set(valores[1])
     entry_conta.pack()
 
     tk.Label(janela_edit, text="Categoria:").pack(pady=5)
-    entry_categoria = ttk.Combobox(janela_edit, values=list(categorias.keys()), width=30)
+    entry_categoria = ttk.Combobox(janela_edit, values=list(categorias.keys()), width=30,height = 50)
     entry_categoria.set(valores[2])
     entry_categoria.pack()   
 
     tk.Label(janela_edit, text="Subcategoria:").pack(pady=5)
-    entry_subcategoria = ttk.Combobox(janela_edit, values=categorias[entry_categoria.get()], postcommand=lambda: entry_subcategoria.config(values=categorias[entry_categoria.get()]), width=30)
+    entry_subcategoria = ttk.Combobox(janela_edit, values=categorias[entry_categoria.get()], postcommand=lambda: entry_subcategoria.config(values=categorias[entry_categoria.get()]), width=30,height = 50)
     entry_subcategoria.set(valores[3])
     entry_subcategoria.pack() 
 
@@ -255,7 +255,6 @@ def atualizar_registro(event):
             df_global.at[idx, 'Descrição'] = entry_desc.get()
             df_global.at[idx, 'Valor'] = float(entry_valor.get())
             df_global.at[idx, 'Tipo'] = combo_tipo.get()
-            # df_global.at[idx, 'Transfer'] = combo_transfer.get()
             atualizar_tabela()
             janela_edit.destroy()
             messagebox.showinfo("Sucesso", "Registro atualizado!")
