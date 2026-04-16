@@ -6,6 +6,7 @@ from datetime import datetime
 from ofxparse import OfxParser
 import os
 import json
+import random
 
 # Variáveis globais
 df_global = None
@@ -119,7 +120,7 @@ def atualizar_tabela():
     
     if df_global is not None and not df_global.empty:
         for idx, row in df_global.iterrows():
-            tree_widget.insert('', 'end', values=(idx, *row.values))
+            tree_widget.insert('', 'end', values=(idx, *row.values), tags=(df_global.iloc[idx].Conta,))
     
     # print(df_global.head())
     # print(df_global.describe())
@@ -549,6 +550,12 @@ def criar_interface():
 
     tree_widget.bind('<Double-1>', atualizar_registro )
     read_txt_settings()
+
+    for conta in contas:
+        tree_widget.tag_configure(conta, background=f"#{random.randint(0, 0xFFFFFF):06x}", foreground=f"#{random.randint(0, 0xFFFFFF):06x}")
+        
+    # Create a tag named 'colored_row' with a red background
+    
     
     root.mainloop()
 
