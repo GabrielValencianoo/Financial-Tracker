@@ -64,6 +64,7 @@ def carregar_excel():
         try:
             df_global = pd.read_excel(filename)
             arquivo_excel = filename
+            df_global['Data'] = pd.to_datetime(df_global['Data']).dt.date
             atualizar_tabela()
             messagebox.showinfo("Sucesso", f"Arquivo carregado: {os.path.basename(filename)}")
         except Exception as e:
