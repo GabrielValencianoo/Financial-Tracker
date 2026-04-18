@@ -6,7 +6,7 @@ from datetime import datetime
 from ofxparse import OfxParser
 import os
 import json
-import random
+import icecream as ic
 
 # Variáveis globais
 df_global = None
@@ -31,7 +31,7 @@ banco_id = {
     
 }
 
-contas = []
+contas = {}
 categorias = {}
 dict_mapeamento = {}
 
@@ -147,7 +147,7 @@ def adicionar_registro():
     
     # Campos
     tk.Label(janela_add, text="Conta:").pack(pady=5)
-    entry_conta = ttk.Combobox(janela_add, values=contas, width=30,height = 50)
+    entry_conta = ttk.Combobox(janela_add, values=list(contas.keys()), width=30,height = 50)
     entry_conta.pack()
 
     tk.Label(janela_add, text="Categoria:").pack(pady=5)
@@ -213,7 +213,7 @@ def atualizar_registro(event):
     janela_edit.geometry("700x700+1200+200")
 
     tk.Label(janela_edit, text="Conta:").pack(pady=5)
-    entry_conta = ttk.Combobox(janela_edit, values=contas, width=30,height = 50)
+    entry_conta = ttk.Combobox(janela_edit, values=list(contas.keys()), width=30,height = 50)
     entry_conta.set(valores[1])
     entry_conta.pack()
 
@@ -553,7 +553,7 @@ def criar_interface():
     read_txt_settings()
 
     for conta in contas:
-        tree_widget.tag_configure(conta, background=f"#{random.randint(0, 0xFFFFFF):06x}", foreground=f"#{random.randint(0, 0xFFFFFF):06x}")
+        tree_widget.tag_configure(conta, background=contas[conta]["corLinha"], foreground=contas[conta]["corFonte"])
         
     # Create a tag named 'colored_row' with a red background
     

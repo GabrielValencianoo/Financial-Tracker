@@ -1,12 +1,30 @@
 {
-  "contas": [
-    "Inter",
-    "C6",
-    "Itau",
-    "Nubank",
-    "Santander",
-    "Bradesco"
-  ],
+  "contas": {
+    "Inter": {
+      "corLinha": "#FA661A",
+      "corFonte": "#FFFFFF"
+    },
+    "C6": {
+      "corLinha": "#FA661A",
+      "corFonte": "#000000"
+    },
+    "Nubank": {
+      "corLinha": "#8D00DA",
+      "corFonte": "#FFFFFF"
+    },
+    "Bradesco": {
+      "corLinha": "#C71F33",
+      "corFonte": "#FFFFFF"
+    },
+    "Itau": {
+      "corLinha": "#C71F33",
+      "corFonte": "#000000"
+    },
+    "Santander": {
+      "corLinha": "#233E8B",
+      "corFonte": "#000000"
+    }
+  },
   "categorias": {
     "Moradia": [
       "Aluguel / Financiamento",
