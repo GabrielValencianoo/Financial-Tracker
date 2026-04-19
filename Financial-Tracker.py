@@ -6,7 +6,7 @@ from datetime import datetime
 from ofxparse import OfxParser
 import os
 import json
-import icecream as ic
+from icecream import ic
 
 # Variáveis globais
 df_global = None
@@ -259,7 +259,8 @@ def atualizar_registro(event):
             df_global.at[idx, 'Tipo'] = combo_tipo.get()
             atualizar_tabela()
             janela_edit.destroy()
-            messagebox.showinfo("Sucesso", "Registro atualizado!")
+            tree_widget.selection_set(tree_widget.get_children()[idx])
+
         except ValueError:
             messagebox.showerror("Erro", "Valor inválido!")
     
