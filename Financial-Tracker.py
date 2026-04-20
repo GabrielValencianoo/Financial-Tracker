@@ -198,65 +198,66 @@ def adicionar_registro():
 def atualizar_registro(event):
     """Atualiza o registro selecionado"""
     global df_global, tree_widget
+    df_multi_select = pd.DataFrame(columns=['id','Conta','Categoria','Subcategoria', 'Valor', 'Tipo', 'Descrição','Data'])
     
     selecionado = tree_widget.selection()
     if not selecionado:
         messagebox.showwarning("Aviso", "Selecione um registro para atualizar!")
         return
     
-    item = tree_widget.item(selecionado[0])
-    valores = item['values']
-    idx = valores[0]
-    
+    for iid in tree_widget.selection():
+        df_multi_select.loc[len(df_multi_select)] = tree_widget.item(iid)['values']
+
     janela_edit = tk.Toplevel()
     janela_edit.title("Atualizar Registro")
     janela_edit.geometry("700x700+1200+200")
 
     tk.Label(janela_edit, text="Conta:").pack(pady=5)
     entry_conta = ttk.Combobox(janela_edit, values=list(contas.keys()), width=30,height = 50)
-    entry_conta.set(valores[1])
+    entry_conta.set(df_multi_select['Conta'].iloc[0] if df_multi_select['Conta'].nunique() == 1 else "")
     entry_conta.pack()
 
     tk.Label(janela_edit, text="Categoria:").pack(pady=5)
     entry_categoria = ttk.Combobox(janela_edit, values=list(categorias.keys()), width=30,height = 50)
-    entry_categoria.set(valores[2])
+    entry_categoria.set(df_multi_select['Categoria'].iloc[0] if df_multi_select['Categoria'].nunique() == 1 else "")
     entry_categoria.pack()   
 
     tk.Label(janela_edit, text="Subcategoria:").pack(pady=5)
-    entry_subcategoria = ttk.Combobox(janela_edit, values=categorias[entry_categoria.get()], postcommand=lambda: entry_subcategoria.config(values=categorias[entry_categoria.get()]), width=30,height = 50)
-    entry_subcategoria.set(valores[3])
+    entry_subcategoria = ttk.Combobox(janela_edit, values=categorias[entry_categoria.get()] if entry_categoria.get() != "" else list(), postcommand=lambda: entry_subcategoria.config(values=categorias[entry_categoria.get()] if entry_categoria.get() != "" else []), width=30,height = 50)
+    entry_subcategoria.set(df_multi_select['Subcategoria'].iloc[0] if df_multi_select['Subcategoria'].nunique() == 1 else "")
     entry_subcategoria.pack() 
 
     tk.Label(janela_edit, text="Valor:").pack(pady=5)
     entry_valor = tk.Entry(janela_edit, width=30)
-    entry_valor.insert(0, valores[4])
+    entry_valor.insert(0, df_multi_select['Valor'].iloc[0] if df_multi_select['Valor'].nunique() == 1 else "")
     entry_valor.pack()
 
     tk.Label(janela_edit, text="Tipo:").pack(pady=5)
     combo_tipo = ttk.Combobox(janela_edit, values=["Receita", "Despesa"], width=28)
-    combo_tipo.set(valores[5])
+    combo_tipo.set(df_multi_select['Tipo'].iloc[0] if df_multi_select['Tipo'].nunique() == 1 else "")
     combo_tipo.pack()
 
     tk.Label(janela_edit, text="Descrição:").pack(pady=5)
     entry_desc = tk.Entry(janela_edit, width=30)
-    entry_desc.insert(0, valores[6])
+    entry_desc.insert(0, df_multi_select['Descrição'].iloc[0] if df_multi_select['Descrição'].nunique() == 1 else "")
     entry_desc.pack()
     
     tk.Label(janela_edit, text="Data (AAAA-MM-DD):").pack(pady=5)
     entry_data = tb.DateEntry(janela_edit,dateformat = "%Y-%m-%d", width=30)
-    entry_data.set_date(datetime.strptime(valores[7], "%Y-%m-%d"))
+    entry_data.set_date(datetime.strptime(df_multi_select['Data'].iloc[0] if df_multi_select['Data'].nunique() == 1 else datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d"))
     entry_data.pack()
     
     
     def salvar_alteracao():
         try:
-            df_global.at[idx, 'Conta'] = entry_conta.get()
-            df_global.at[idx, 'Categoria'] = entry_categoria.get()
-            df_global.at[idx, 'Subcategoria'] = entry_subcategoria.get()
-            df_global.at[idx, 'Data'] = entry_data.get_date().strftime("%Y-%m-%d")
-            df_global.at[idx, 'Descrição'] = entry_desc.get()
-            df_global.at[idx, 'Valor'] = float(entry_valor.get())
-            df_global.at[idx, 'Tipo'] = combo_tipo.get()
+            for idx in df_multi_select['id']:
+                df_global.at[idx, 'Conta'] = entry_conta.get() if entry_conta.get() != "" else df_global.at[idx, 'Conta']
+                df_global.at[idx, 'Categoria'] = entry_categoria.get() if entry_categoria.get() != "" else df_global.at[idx, 'Categoria']
+                df_global.at[idx, 'Subcategoria'] = entry_subcategoria.get() if entry_subcategoria.get() != "" else df_global.at[idx, 'Subcategoria']
+                df_global.at[idx, 'Data'] = entry_data.get_date().strftime("%Y-%m-%d") if entry_data.get_date() != "" else df_global.at[idx, 'Data']
+                df_global.at[idx, 'Descrição'] = entry_desc.get() if entry_desc.get() != "" else df_global.at[idx, 'Descrição']
+                df_global.at[idx, 'Valor'] = float(entry_valor.get()) if entry_valor.get() != "" else df_global.at[idx, 'Valor']
+                df_global.at[idx, 'Tipo'] = combo_tipo.get() if combo_tipo.get() != "" else df_global.at[idx, 'Tipo']
             atualizar_tabela()
             janela_edit.destroy()
             tree_widget.selection_set(tree_widget.get_children()[idx])
@@ -526,7 +527,7 @@ def criar_interface():
     
     # Treeview
     colunas =('ID','Conta','Categoria','Subcategoria', 'Valor', 'Tipo', 'Descrição','Data')
-    tree_widget = ttk.Treeview(frame_tabela, columns=colunas, show='headings', 
+    tree_widget = ttk.Treeview(frame_tabela, columns=colunas, show='headings', selectmode='extended',
                                yscrollcommand=scrollbar.set)
 
     tree_widget.heading('ID', text='ID')
