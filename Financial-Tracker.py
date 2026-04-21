@@ -12,7 +12,7 @@ from icecream import ic
 df_global = None
 arquivo_excel = None
 tree_widget = None
-
+frame_contas = None
 banco_id = {
     '001': 'Banco do Brasil',
     '033': 'Santander',
@@ -113,26 +113,26 @@ def salvar_excel():
 
 def atualizar_tabela():
     """Atualiza a visualização da tabela"""
-    global tree_widget, df_global
+    global tree_widget, df_global, frame_contas
     
     # Limpar tabela
     for item in tree_widget.get_children():
         tree_widget.delete(item)
     
+    for widget in frame_contas.winfo_children():
+        widget.destroy()
+    
     if df_global is not None and not df_global.empty:
         for idx, row in df_global.iterrows():
             tree_widget.insert('', 'end', values=(idx, *row.values), tags=(df_global.iloc[idx].Conta,))
     
-    # print(df_global.head())
-    # print(df_global.describe())
-    # print(df_global.info())
-    print(df_global["Conta"].unique())
-    print(df_global.groupby('Conta').size())
-    print(df_global.groupby('Categoria').size())
-    print(df_global.groupby('Subcategoria').size())
-    print(df_global.groupby('Tipo').size())    
-    print(df_global["Valor"].sum())
-    print(df_global.groupby('Conta')["Valor"].sum().round(2))
+    ic(df_global["Valor"].sum())
+    ic(df_global.groupby('Conta')["Valor"].sum().round(2))
+
+    for conta in contas.keys():
+        label = ttk.Label(frame_contas, width=30, justify='center', background=contas[conta]["corLinha"], foreground=contas[conta]["corFonte"], font=('Arial', 10, 'bold'))
+        label.pack(side=tk.LEFT, padx=5)
+        label.config(text=f"{conta}: R$ {df_global[df_global['Conta'] == conta]['Valor'].sum():.2f}")
 
 def adicionar_registro():
     """Abre janela para adicionar novo registro"""
@@ -480,7 +480,7 @@ def read_txt_settings():
 
 def criar_interface():
     """Cria a interface principal"""
-    global tree_widget
+    global tree_widget, frame_contas
     
     root = tk.Tk()
     root.title("Gerenciador de Finanças - Excel e OFX")
@@ -516,6 +516,9 @@ def criar_interface():
     tk.Button(frame_crud, text="Duplicar", command=duplicar_registro, 
               bg="#FFC107", fg="white", width=12).grid(row=0, column=4, padx=5)  
     
+    # Frame valores contas
+    frame_contas = tk.Frame(root)
+    frame_contas.pack(pady=10)
 
     # Frame da tabela
     frame_tabela = tk.Frame(root)
