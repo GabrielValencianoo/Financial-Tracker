@@ -244,7 +244,7 @@ def atualizar_registro(event):
     
     tk.Label(janela_edit, text="Data (AAAA-MM-DD):").pack(pady=5)
     entry_data = tb.DateEntry(janela_edit,dateformat = "%Y-%m-%d", width=30)
-    entry_data.set_date(datetime.strptime(df_multi_select['Data'].iloc[0] if df_multi_select['Data'].nunique() == 1 else datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d"))
+    entry_data.set_date(datetime.strptime(df_multi_select['Data'].iloc[0] if df_multi_select['Data'].nunique() == 1 else datetime.strftime(datetime.min, "%Y-%m-%d"), "%Y-%m-%d"))
     entry_data.pack()
     
     
@@ -254,7 +254,7 @@ def atualizar_registro(event):
                 df_global.at[idx, 'Conta'] = entry_conta.get() if entry_conta.get() != "" else df_global.at[idx, 'Conta']
                 df_global.at[idx, 'Categoria'] = entry_categoria.get() if entry_categoria.get() != "" else df_global.at[idx, 'Categoria']
                 df_global.at[idx, 'Subcategoria'] = entry_subcategoria.get() if entry_subcategoria.get() != "" else df_global.at[idx, 'Subcategoria']
-                df_global.at[idx, 'Data'] = entry_data.get_date().strftime("%Y-%m-%d") if entry_data.get_date() != "" else df_global.at[idx, 'Data']
+                df_global.at[idx, 'Data'] = entry_data.get_date().strftime("%Y-%m-%d") if entry_data.get_date() != datetime(1, 1, 1) else df_global.at[idx, 'Data']
                 df_global.at[idx, 'Descrição'] = entry_desc.get() if entry_desc.get() != "" else df_global.at[idx, 'Descrição']
                 df_global.at[idx, 'Valor'] = float(entry_valor.get()) if entry_valor.get() != "" else df_global.at[idx, 'Valor']
                 df_global.at[idx, 'Tipo'] = combo_tipo.get() if combo_tipo.get() != "" else df_global.at[idx, 'Tipo']
