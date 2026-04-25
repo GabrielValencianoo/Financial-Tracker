@@ -282,7 +282,7 @@ def duplicar_registro():
     idx = valores[0]
     
     nova_linha = df_global.loc[idx].copy()
-    df_global.loc[len(df_global)] = nova_linha
+    df_global.loc[idx+1] = nova_linha
     atualizar_tabela()
     messagebox.showinfo("Sucesso", "Registro duplicado!")
 
