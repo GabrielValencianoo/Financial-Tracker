@@ -144,6 +144,14 @@ def adicionar_registro():
     janela_add = tk.Toplevel()
     janela_add.title("Adicionar Registro")
     janela_add.geometry("700x700+1200+200")
+
+    try:
+        selecionado = tree_widget.selection()    
+        item = tree_widget.item(selecionado[0])
+        valores = item['values']
+        idx = valores[0]+1
+    except:
+        idx = len(df_global)
     
     # Campos
     tk.Label(janela_add, text="Conta:").pack(pady=5)
@@ -186,7 +194,7 @@ def adicionar_registro():
                 'Valor': float(entry_valor.get()),
                 'Tipo': combo_tipo.get()
             }
-            df_global.loc[len(df_global)] = nova_linha
+            df_global.loc[idx] = nova_linha
             atualizar_tabela()
             janela_add.destroy()
             messagebox.showinfo("Sucesso", "Registro adicionado!")
