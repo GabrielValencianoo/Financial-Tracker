@@ -387,7 +387,9 @@ def importar_csv():
                 else:
                     # Mapeia a coluna do CSV para o nome da sua coluna original
                     df_novo[col_prog] = df_importado[escolha].values
-                
+
+            for idx in df_novo.index:                
+                df_novo.at[idx, 'Tipo'] = "Receita" if df_novo.at[idx, 'Valor'] > 0 else "Despesa"
 
             print(df_novo.head())
             # 1. Concatena o df original com o novo processado
