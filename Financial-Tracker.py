@@ -354,8 +354,12 @@ def importar_csv():
         for col_prog in df_global.columns:
             lbl = tk.Label(janela_csv, text=f"{col_prog}:", font=('Arial', 10, 'bold'))
             lbl.pack(anchor="w", pady=(5, 0))
-           
-            combo = ttk.Combobox(janela_csv, values=["IGNORAR"] + colunas_csv, state="readonly", width=30)
+
+            if col_prog == "Conta":
+                combo = ttk.Combobox(janela_csv, values=["IGNORAR"] + colunas_csv+list(contas.keys()), state="readonly", width=30)
+
+            else:
+                combo = ttk.Combobox(janela_csv, values=["IGNORAR"] + colunas_csv, state="readonly", width=30)
             combo.pack(fill="x", pady=2)
             dict_mapeamento[col_prog] = combo
 
@@ -386,6 +390,10 @@ def importar_csv():
                 if col_prog == "Inverter valores":
                     if escolha == "Sim":
                         df_novo['Valor'] = -df_importado[dict_mapeamento['Valor'].get()].values
+                    continue
+                
+                if col_prog == "Conta" and escolha in contas.keys():
+                    df_novo[col_prog] = escolha
                     continue
 
                 if escolha == "IGNORAR":
