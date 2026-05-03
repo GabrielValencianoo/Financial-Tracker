@@ -309,7 +309,6 @@ def deletar_registro():
         idx = item['values'][0]
         df_global = df_global.drop(index=idx).reset_index(drop=True)
         atualizar_tabela()
-        messagebox.showinfo("Sucesso", "Registro deletado!")
 
 def deletar_tabela():
     """Deleta todos os registros da tabela"""
