@@ -294,7 +294,7 @@ def duplicar_registro():
     atualizar_tabela()
     messagebox.showinfo("Sucesso", "Registro duplicado!")
 
-def deletar_registro():
+def deletar_registro(event):
     """Deleta o registro selecionado"""
     global df_global, tree_widget
     
@@ -579,7 +579,8 @@ def criar_interface():
     tree_widget.pack(fill=tk.BOTH, expand=True)
     scrollbar.config(command=tree_widget.yview)
 
-    tree_widget.bind('<Double-1>', atualizar_registro )
+    tree_widget.bind('<Double-1>', atualizar_registro)
+    tree_widget.bind('<Delete>', deletar_registro)
     read_txt_settings()
 
     for conta in contas:
