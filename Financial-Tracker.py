@@ -110,6 +110,27 @@ def salvar_excel():
             print(str(e))
             messagebox.showerror("Erro", f"Erro ao salvar arquivo: {str(e)}")
             
+def salvar_como_excel():
+    """Salva o DataFrame em um novo arquivo Excel"""
+    global df_global
+    
+    if df_global is None:
+        messagebox.showwarning("Aviso", "Nenhum dado para salvar!")
+        return
+    
+    filename = filedialog.asksaveasfilename(
+        title="Salvar como arquivo Excel",
+        defaultextension=".xlsx",
+        filetypes=[("Excel files", "*.xlsx")]
+    )
+    
+    if filename:
+        try:
+            df_global.to_excel(filename, index=False)
+            messagebox.showinfo("Sucesso", "Arquivo salvo com sucesso!")
+        except Exception as e:
+            print(str(e))
+            messagebox.showerror("Erro", f"Erro ao salvar arquivo: {str(e)}")
 
 def atualizar_tabela():
     """Atualiza a visualização da tabela"""
@@ -521,10 +542,12 @@ def criar_interface():
               bg="#2196F3", fg="white", width=12).grid(row=0, column=1, padx=5)
     tk.Button(frame_botoes, text="Salvar Excel", command=salvar_excel, 
               bg="#FF9800", fg="white", width=12).grid(row=0, column=2, padx=5)
+    tk.Button(frame_botoes, text="Salvar como Excel", command=salvar_como_excel, 
+              bg="#FF9800", fg="white", width=12).grid(row=0, column=3, padx=5)
     tk.Button(frame_botoes, text="Importar OFX", command=importar_ofx, 
-              bg="#9C27B0", fg="white", width=12).grid(row=0, column=3, padx=5)
+              bg="#9C27B0", fg="white", width=12).grid(row=0, column=4, padx=5)
     tk.Button(frame_botoes, text="Importar CSV", command=importar_csv, 
-              bg="#009688", fg="white", width=12).grid(row=0, column=4, padx=5)
+              bg="#009688", fg="white", width=12).grid(row=0, column=5, padx=5)
     
     # Frame CRUD
     frame_crud = tk.Frame(root)
