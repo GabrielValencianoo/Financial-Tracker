@@ -536,18 +536,6 @@ def criar_interface():
     frame_botoes = tk.Frame(root)
     frame_botoes.pack(pady=10)
     
-    tk.Button(frame_botoes, text="Novo Excel", command=criar_novo_excel, 
-              bg="#4CAF50", fg="white", width=12).grid(row=0, column=0, padx=5)
-    tk.Button(frame_botoes, text="Abrir Excel", command=carregar_excel, 
-              bg="#2196F3", fg="white", width=12).grid(row=0, column=1, padx=5)
-    tk.Button(frame_botoes, text="Salvar Excel", command=salvar_excel, 
-              bg="#FF9800", fg="white", width=12).grid(row=0, column=2, padx=5)
-    tk.Button(frame_botoes, text="Salvar como Excel", command=salvar_como_excel, 
-              bg="#FF9800", fg="white", width=12).grid(row=0, column=3, padx=5)
-    tk.Button(frame_botoes, text="Importar OFX", command=importar_ofx, 
-              bg="#9C27B0", fg="white", width=12).grid(row=0, column=4, padx=5)
-    tk.Button(frame_botoes, text="Importar CSV", command=importar_csv, 
-              bg="#009688", fg="white", width=12).grid(row=0, column=5, padx=5)
     
     # Frame CRUD
     frame_crud = tk.Frame(root)
@@ -610,8 +598,22 @@ def criar_interface():
         tree_widget.tag_configure(conta, background=contas[conta]["corLinha"], foreground=contas[conta]["corFonte"])
         
     # Create a tag named 'colored_row' with a red background
+    menubar = tk.Menu(root)
+    filemenu = tk.Menu(menubar, tearoff=0)
+
+    menubar.add_cascade(label="File", menu=filemenu)
+
+    filemenu.add_command(label="Novo Excel", command=criar_novo_excel)
+    filemenu.add_command(label="Abrir Excel", command=carregar_excel)
+    filemenu.add_separator()
+    filemenu.add_command(label="Salvar", command=salvar_excel)
+    filemenu.add_command(label="Salvar como", command=salvar_como_excel)
+    filemenu.add_separator()
+    filemenu.add_command(label="Importar OFX", command=importar_ofx)
+    filemenu.add_command(label="Importar CSV", command=importar_csv)
+
     
-    
+    root.config(menu=menubar)
     root.mainloop()
 
 if __name__ == "__main__":
