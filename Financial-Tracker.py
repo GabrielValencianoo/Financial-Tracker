@@ -205,17 +205,20 @@ def adicionar_registro():
 
     
     def salvar_novo():
+        global df_global
         try:
-            nova_linha = {
-                'Conta': entry_conta.get(),
-                'Categoria': entry_categoria.get(),
-                'Subcategoria': entry_subcategoria.get(),
-                'Data': entry_data.get_date().strftime("%Y-%m-%d"),
-                'Descrição': entry_desc.get(),
-                'Valor': float(entry_valor.get()),
-                'Tipo': combo_tipo.get()
-            }
-            df_global.loc[idx] = nova_linha
+            nova_linha = pd.DataFrame({
+                'Conta': [entry_conta.get()],
+                'Categoria': [entry_categoria.get()],
+                'Subcategoria': [entry_subcategoria.get()],
+                'Data': [entry_data.get_date().strftime("%Y-%m-%d")],
+                'Descrição': [entry_desc.get()],
+                'Valor': [float(entry_valor.get())],
+                'Tipo': [combo_tipo.get()]
+            })
+            # Divida o DF em duas partes e concatene
+            df_global = pd.concat(
+            [df_global.iloc[:idx], nova_linha, df_global.iloc[idx:]],ignore_index=True).reset_index(drop=True)
             atualizar_tabela()
             janela_add.destroy()
             messagebox.showinfo("Sucesso", "Registro adicionado!")
@@ -308,10 +311,11 @@ def duplicar_registro():
     
     item = tree_widget.item(selecionado[0])
     valores = item['values']
-    idx = valores[0]
+    idx = valores[0]+1
     
-    nova_linha = df_global.loc[idx].copy()
-    df_global.loc[idx+1] = nova_linha
+    nova_linha = df_global.loc[[idx-1]].copy()
+    df_global = pd.concat(
+    [df_global.iloc[:idx], nova_linha, df_global.iloc[idx:]],ignore_index=True).reset_index(drop=True)
     atualizar_tabela()
     messagebox.showinfo("Sucesso", "Registro duplicado!")
 
