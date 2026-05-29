@@ -147,6 +147,8 @@ def atualizar_tabela():
         for idx, row in df_global.iterrows():
             tree_widget.insert('', 'end', values=(idx, *row.values), tags=(df_global.iloc[idx].Conta,))
     
+    tree_widget.yview_moveto(1)
+    
     ic(df_global["Valor"].sum())
     ic(df_global.groupby('Conta')["Valor"].sum().round(2))
 
