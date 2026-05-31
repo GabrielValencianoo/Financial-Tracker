@@ -65,7 +65,7 @@ def carregar_excel():
             df_global = pd.read_excel(filename)
             arquivo_excel = filename
             df_global['Data'] = pd.to_datetime(df_global['Data']).dt.date
-            atualizar_tabela()
+            atualizar_tabela(ToEnd=True)
             messagebox.showinfo("Sucesso", f"Arquivo carregado: {os.path.basename(filename)}")
         except Exception as e:
             messagebox.showerror("Erro", f"Erro ao carregar arquivo: {str(e)}")
@@ -84,7 +84,7 @@ def criar_novo_excel():
         df_global = criar_excel_padrao()
         arquivo_excel = filename
         salvar_excel()
-        atualizar_tabela()
+        atualizar_tabela(ToEnd=False)
         messagebox.showinfo("Sucesso", "Novo arquivo Excel criado!")
 
 def salvar_excel():
@@ -132,7 +132,7 @@ def salvar_como_excel():
             print(str(e))
             messagebox.showerror("Erro", f"Erro ao salvar arquivo: {str(e)}")
 
-def atualizar_tabela():
+def atualizar_tabela(ToEnd=False):
     """Atualiza a visualização da tabela"""
     global tree_widget, df_global, frame_contas
     
@@ -147,7 +147,8 @@ def atualizar_tabela():
         for idx, row in df_global.iterrows():
             tree_widget.insert('', 'end', values=(idx, *row.values), tags=(df_global.iloc[idx].Conta,))
     
-    tree_widget.yview_moveto(1)
+    if ToEnd == True:
+        tree_widget.yview_moveto(1)
     
     ic(df_global["Valor"].sum())
     ic(df_global.groupby('Conta')["Valor"].sum().round(2))
@@ -221,7 +222,7 @@ def adicionar_registro():
             # Divida o DF em duas partes e concatene
             df_global = pd.concat(
             [df_global.iloc[:idx], nova_linha, df_global.iloc[idx:]],ignore_index=True).reset_index(drop=True)
-            atualizar_tabela()
+            atualizar_tabela(ToEnd=True)
             janela_add.destroy()
             messagebox.showinfo("Sucesso", "Registro adicionado!")
         except ValueError:
@@ -292,7 +293,7 @@ def atualizar_registro(event):
                 df_global.at[idx, 'Descrição'] = entry_desc.get() if entry_desc.get() != "" else df_global.at[idx, 'Descrição']
                 df_global.at[idx, 'Valor'] = float(entry_valor.get()) if entry_valor.get() != "" else df_global.at[idx, 'Valor']
                 df_global.at[idx, 'Tipo'] = combo_tipo.get() if combo_tipo.get() != "" else df_global.at[idx, 'Tipo']
-            atualizar_tabela()
+            atualizar_tabela(ToEnd=False)
             janela_edit.destroy()
             tree_widget.selection_set(tree_widget.get_children()[idx])
 
@@ -318,7 +319,7 @@ def duplicar_registro():
     nova_linha = df_global.loc[[idx-1]].copy()
     df_global = pd.concat(
     [df_global.iloc[:idx], nova_linha, df_global.iloc[idx:]],ignore_index=True).reset_index(drop=True)
-    atualizar_tabela()
+    atualizar_tabela(ToEnd=False)
     messagebox.showinfo("Sucesso", "Registro duplicado!")
 
 def deletar_registro(event):
@@ -335,7 +336,7 @@ def deletar_registro(event):
         item = tree_widget.item(selecionado[0])
         idx = item['values'][0]
         df_global = df_global.drop(index=idx).reset_index(drop=True)
-        atualizar_tabela()
+        atualizar_tabela(ToEnd=False)
 
 def deletar_tabela():
     """Deleta todos os registros da tabela"""
@@ -348,7 +349,7 @@ def deletar_tabela():
     resposta = messagebox.askyesno("Confirmar", "Deseja realmente deletar TODOS os registros?")
     if resposta:
         df_global = criar_excel_padrao()
-        atualizar_tabela()
+        atualizar_tabela(ToEnd=False)
         messagebox.showinfo("Sucesso", "Todos os registros foram deletados!")
 
 
@@ -440,7 +441,7 @@ def importar_csv():
             # 2. A MÁGICA: Substitui todos os valores NaN por string vazia ''
             df_global = df_final.fillna('')
 
-            atualizar_tabela()
+            atualizar_tabela(ToEnd=True)
             janela_csv.destroy()
             messagebox.showinfo("Sucesso", f"{len(df_importado)} registros importados do CSV!")
             
@@ -507,7 +508,7 @@ def importar_ofx():
                     df_global.loc[len(df_global)] = nova_linha
                     transacoes_adicionadas += 1
             
-            atualizar_tabela()
+            atualizar_tabela(ToEnd=True)
             messagebox.showinfo("Sucesso", f"{transacoes_adicionadas} transações importadas do arquivo OFX!")
             
         except Exception as e:
