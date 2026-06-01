@@ -325,17 +325,23 @@ def duplicar_registro():
 def deletar_registro(event):
     """Deleta o registro selecionado"""
     global df_global, tree_widget
+    df_multi_select = pd.DataFrame(columns=['id','Conta','Categoria','Subcategoria', 'Valor', 'Tipo', 'Descrição','Data'])
     
     selecionado = tree_widget.selection()
     if not selecionado:
         messagebox.showwarning("Aviso", "Selecione um registro para deletar!")
         return
-    
+
+    for iid in tree_widget.selection():
+        df_multi_select.loc[len(df_multi_select)] = tree_widget.item(iid)['values']
+        ic(df_multi_select)
+    df_multi_select = df_multi_select.iloc[::-1]
+    ic(df_multi_select)
     resposta = messagebox.askyesno("Confirmar", "Deseja realmente deletar este registro?")
     if resposta:
-        item = tree_widget.item(selecionado[0])
-        idx = item['values'][0]
-        df_global = df_global.drop(index=idx).reset_index(drop=True)
+        for idx in df_multi_select['id']:
+            ic(idx)
+            df_global = df_global.drop(index=idx).reset_index(drop=True)
         atualizar_tabela(ToEnd=False)
 
 def deletar_tabela():
