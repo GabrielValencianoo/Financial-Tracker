@@ -112,7 +112,7 @@ def salvar_excel():
             
 def salvar_como_excel():
     """Salva o DataFrame em um novo arquivo Excel"""
-    global df_global
+    global df_global, arquivo_excel
     
     if df_global is None:
         messagebox.showwarning("Aviso", "Nenhum dado para salvar!")
@@ -123,7 +123,7 @@ def salvar_como_excel():
         defaultextension=".xlsx",
         filetypes=[("Excel files", "*.xlsx")]
     )
-    
+    arquivo_excel = filename
     if filename:
         try:
             df_global.to_excel(filename, index=False)
