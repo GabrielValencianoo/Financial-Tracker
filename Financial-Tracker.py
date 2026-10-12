@@ -53,7 +53,7 @@ def criar_excel_padrao():
 
 def carregar_excel():
     """Carrega arquivo Excel"""
-    global df_global, arquivo_excel
+    global df_global, arquivo_excel, contas, categorias
     
     filename = filedialog.askopenfilename(
         title="Selecione o arquivo Excel",
@@ -62,9 +62,43 @@ def carregar_excel():
     
     if filename:
         try:
-            df_global = pd.read_excel(filename)
+            df_global = pd.read_excel(filename, sheet_name="Registros")
             arquivo_excel = filename
             df_global['Data'] = pd.to_datetime(df_global['Data']).dt.date
+            
+
+            # 1️⃣ Lê o arquivo Excel (5 colunas)
+            df = pd.read_excel(filename, sheet_name="Categorias",engine='openpyxl')
+
+            # 2️⃣ Converte para a estrutura JSON desejada
+
+            for categoria, group in df.groupby('Categoria'):
+                categorias[categoria] = []
+
+                for _, row in group.iterrows():
+                    entry = {
+                        "Subcategoria": row["Subcategoria"],
+                        "Essencial/Não essencial": row["Essencial/Não essencial"],
+                        "Fixo/ Variável": row["Fixo/ Variável"],
+                        "Casal/Individual": row["Casal/Individual"]
+                    }
+                    categorias[categoria].append(entry)
+
+
+            # 1️⃣ Lê o arquivo Excel (5 colunas)
+            df_contas = pd.read_excel(filename, sheet_name="Contas",engine='openpyxl')
+
+            # 2️⃣ Converte para a estrutura JSON desejada
+            for _, row in df_contas.iterrows():
+                conta = str(row['Conta']).strip()            # garante string e remove espaços extras
+                contas[conta] = {
+                    'corLinha': str(row['Cor Linha']).strip(),
+                    'corFonte': str(row['Cor Fonte']).strip()
+                }
+            for conta in contas:
+                tree_widget.tag_configure(conta, background=contas[conta]["corLinha"], foreground=contas[conta]["corFonte"])
+
+
             atualizar_tabela(ToEnd=True)
             messagebox.showinfo("Sucesso", f"Arquivo carregado: {os.path.basename(filename)}")
         except Exception as e:
@@ -89,7 +123,7 @@ def criar_novo_excel():
 
 def salvar_excel():
     """Salva o DataFrame no arquivo Excel"""
-    global df_global, arquivo_excel
+    global df_global, arquivo_excel, contas, categorias
     
     if df_global is None:
         messagebox.showwarning("Aviso", "Nenhum dado para salvar!")
@@ -104,8 +138,54 @@ def salvar_excel():
     
     if arquivo_excel:
         try:
-            df_global.to_excel(arquivo_excel, index=False)
+
+            # 2️⃣ Cria lista de linhas (dicionários) para o DataFrame
+            rows_categorias = []
+            for categoria, subcat_list in categorias.items():
+                for item in subcat_list:
+                    row = {
+                        'Categoria': categoria,
+                        'Subcategoria': item['Subcategoria'],
+                        'Essencial/Não essencial': item['Essencial/Não essencial'],
+                        'Fixo/ Variável': item['Fixo/ Variável'],
+                        'Casal/Individual': item['Casal/Individual']
+                    }
+                    rows_categorias.append(row)
+
+            # 3️⃣ Monta DataFrame e grava em Excel
+            df_categorias = pd.DataFrame(rows_categorias,
+                            columns=['Categoria',
+                                    'Subcategoria',
+                                    'Essencial/Não essencial',
+                                    'Fixo/ Variável',
+                                    'Casal/Individual'])
+
+            
+            
+
+            # 2️⃣ Converte para lista de linhas (dicts)
+            rows_contas = []
+            for conta, colors in contas.items():
+                row = {
+                    'Conta': conta,
+                    'Cor Linha': colors.get('corLinha'),
+                    'Cor Fonte': colors.get('corFonte')
+                }
+                rows_contas.append(row)
+
+            # 3️⃣ Monta DataFrame e grava em Excel
+            df_contas = pd.DataFrame(rows_contas, columns=['Conta', 'Cor Linha', 'Cor Fonte'])
+
+            with pd.ExcelWriter(arquivo_excel, engine="openpyxl") as writer:          
+                  
+                df_global.to_excel(writer, sheet_name="Registros",index=False)
+                df_categorias.to_excel(writer, index=False, sheet_name="Categorias")
+                df_contas.to_excel(writer, index=False, sheet_name="Contas")
+
+
             messagebox.showinfo("Sucesso", "Arquivo salvo com sucesso!")
+
+
         except Exception as e:
             print(str(e))
             messagebox.showerror("Erro", f"Erro ao salvar arquivo: {str(e)}")
@@ -126,7 +206,51 @@ def salvar_como_excel():
     arquivo_excel = filename
     if filename:
         try:
-            df_global.to_excel(filename, index=False)
+            # 2️⃣ Cria lista de linhas (dicionários) para o DataFrame
+            rows_categorias = []
+            for categoria, subcat_list in categorias.items():
+                for item in subcat_list:
+                    row = {
+                        'Categoria': categoria,
+                        'Subcategoria': item['Subcategoria'],
+                        'Essencial/Não essencial': item['Essencial/Não essencial'],
+                        'Fixo/ Variável': item['Fixo/ Variável'],
+                        'Casal/Individual': item['Casal/Individual']
+                    }
+                    rows_categorias.append(row)
+
+            # 3️⃣ Monta DataFrame e grava em Excel
+            df_categorias = pd.DataFrame(rows_categorias,
+                            columns=['Categoria',
+                                    'Subcategoria',
+                                    'Essencial/Não essencial',
+                                    'Fixo/ Variável',
+                                    'Casal/Individual'])
+
+            
+            
+
+            # 2️⃣ Converte para lista de linhas (dicts)
+            rows_contas = []
+            # for conta, colors in contas.get('contas', {}).items():
+            for conta, colors in contas.items():
+                row = {
+                    'Conta': conta,
+                    'Cor Linha': colors.get('corLinha'),
+                    'Cor Fonte': colors.get('corFonte')
+                }
+                rows_contas.append(row)
+
+            # 3️⃣ Monta DataFrame e grava em Excel
+            df_contas = pd.DataFrame(rows_contas, columns=['Conta', 'Cor Linha', 'Cor Fonte'])
+
+            with pd.ExcelWriter(arquivo_excel, engine="openpyxl") as writer:          
+                  
+                df_global.to_excel(writer, sheet_name="Registros",index=False)
+                df_categorias.to_excel(writer, index=False, sheet_name="Categorias")
+                df_contas.to_excel(writer, index=False, sheet_name="Contas")
+
+
             messagebox.showinfo("Sucesso", "Arquivo salvo com sucesso!")
         except Exception as e:
             print(str(e))
@@ -187,7 +311,7 @@ def adicionar_registro():
     entry_categoria.pack()   
 
     tk.Label(janela_add, text="Subcategoria:").pack(pady=5)
-    entry_subcategoria = ttk.Combobox(janela_add, postcommand=lambda: entry_subcategoria.config(values=categorias[entry_categoria.get()]), width=30,height = 50)
+    entry_subcategoria = ttk.Combobox(janela_add, postcommand=lambda: entry_subcategoria.config(values=[item['Subcategoria'] for item in categorias[entry_categoria.get()]] if entry_categoria.get() != "" else []), width=30,height = 50)
     entry_subcategoria.pack() 
 
     tk.Label(janela_add, text="Valor:").pack(pady=5)
@@ -258,7 +382,8 @@ def atualizar_registro(event):
     entry_categoria.pack()   
 
     tk.Label(janela_edit, text="Subcategoria:").pack(pady=5)
-    entry_subcategoria = ttk.Combobox(janela_edit, values=categorias[entry_categoria.get()] if entry_categoria.get() != "" else list(), postcommand=lambda: entry_subcategoria.config(values=categorias[entry_categoria.get()] if entry_categoria.get() != "" else []), width=30,height = 50)
+    entry_subcategoria = ttk.Combobox(janela_edit, values=[item['Subcategoria'] for item in categorias[entry_categoria.get()]] if entry_categoria.get() != "" else list(), postcommand=lambda: entry_subcategoria.config(values=[item['Subcategoria'] for item in categorias[entry_categoria.get()]] if entry_categoria.get() != "" else []), width=30,height = 50)
+    
     entry_subcategoria.set(df_multi_select['Subcategoria'].iloc[0] if df_multi_select['Subcategoria'].nunique() == 1 else "")
     entry_subcategoria.pack() 
 
@@ -521,21 +646,6 @@ def importar_ofx():
             messagebox.showerror("Erro", f"Erro ao importar OFX: {str(e)}")
 
 
-def read_txt_settings():
-    """Lê configurações de um arquivo .txt (exemplo para futuras customizações)"""
-    global contas, categorias
-    jsonSettings = {}
-    try:
-        with open("Financial_Settings.json", "r", encoding="utf-8") as file:
-            jsonSettings = json.load(file)
-    except FileNotFoundError:
-        print("Arquivo de configuração não encontrado. Usando configurações padrão.")
-    except Exception as e:
-        print(f"Erro ao ler configurações: {str(e)}")
-    
-
-    contas = jsonSettings.get("contas", [])
-    categorias = jsonSettings.get("categorias", {})
 
 def criar_interface():
     """Cria a interface principal"""
@@ -605,12 +715,7 @@ def criar_interface():
 
     tree_widget.bind('<Double-1>', atualizar_registro)
     tree_widget.bind('<Delete>', deletar_registro)
-    read_txt_settings()
-
-    for conta in contas:
-        tree_widget.tag_configure(conta, background=contas[conta]["corLinha"], foreground=contas[conta]["corFonte"])
-        
-    # Create a tag named 'colored_row' with a red background
+    
     menubar = tk.Menu(root)
     filemenu = tk.Menu(menubar, tearoff=0)
 
