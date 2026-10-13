@@ -504,7 +504,7 @@ def importar_csv():
         return
     
     try:
-        df_importado = pd.read_csv(filename)
+        df_importado = pd.read_csv(filename, encoding='latin1',sep=';', decimal=',')
         colunas_csv = df_importado.columns.tolist()
         janela_csv = tk.Toplevel()
         janela_csv.title("Importar CSV")
